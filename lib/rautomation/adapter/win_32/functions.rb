@@ -69,6 +69,16 @@ module RAutomation
                         [:pointer], :bool
         attach_function :set_cursor_pos, :SetCursorPos,
                         [:int, :int], :int
+        attach_function :get_menu, :GetMenu,
+                        [:long], :long
+        attach_function :get_sub_menu, :GetSubMenu,
+                        [:long, :int], :long
+        attach_function :get_menu_item_count, :GetMenuItemCount,
+                        [:long], :int
+        attach_function :_get_menu_string, :GetMenuString,
+                        [:long, :int, :pointer, :int, :int], :int
+        attach_function :_get_menu_item_rect, :GetMenuItemRect,
+                        [:long, :long, :int, :pointer], :bool
 
         # kernel32
         attach_function :current_thread_id, :GetCurrentThreadId,
@@ -193,6 +203,19 @@ module RAutomation
             end
           end
 
+          def get_menu_string(hmenu, item)
+            string_length = _get_menu_string(hmenu, item, nil, 0, 0x400)
+            string = FFI::MemoryPointer.new :char, string_length
+            _get_menu_string(hmenu, item, string, string_length, 0x400)
+            string.read_string
+          end
+          
+          def get_menu_item_rect(hwnd, hmenu, index)
+            x = FFI::MemoryPointer.new(:long, 4)
+            _get_menu_item_rect(hwnd, hmenu, index, x)
+            x.read_array_of_long(4)
+          end
+          
           alias_method :activate_control, :activate_window
 
           def control_hwnd(window_hwnd, locators)

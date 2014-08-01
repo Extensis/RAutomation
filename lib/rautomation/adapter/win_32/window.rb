@@ -184,6 +184,10 @@ module RAutomation
           Mouse.new(self)
         end
 
+        def menu_bar
+          Menu.new(self)
+        end
+        
         # @see Button#initialize
         # @see RAutomation::Window#button
         def button(locator)

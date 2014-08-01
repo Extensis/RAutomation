@@ -27,6 +27,7 @@ RAutomation provides:
   s.require_paths = ["lib"]  
 
   s.add_dependency("ffi", "1.9.0")
+  s.add_dependency("win32-process", "~> 0.7.4")
   s.add_development_dependency("rspec", "~> 2.14")
   s.add_development_dependency("rake")
   s.add_development_dependency("yard")
