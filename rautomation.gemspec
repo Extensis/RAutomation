@@ -24,9 +24,10 @@ RAutomation provides:
   ]
   s.files         = `git ls-files`.split("\n") + ext_binaries
   s.test_files    = `git ls-files -- spec/*`.split("\n")
-  s.require_paths = ["lib"]  
+  s.require_paths = ["lib"]
 
-  s.add_dependency("ffi", "~>1.9.0")
+  s.add_dependency("ffi", "~>1.9.4")
+  s.add_dependency("windows-pr", "~> 0.8.3")
   s.add_development_dependency("rspec", "~> 2.14")
   s.add_development_dependency("rake")
   s.add_development_dependency("yard")
