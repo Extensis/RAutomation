@@ -7,6 +7,8 @@ module RAutomation
         WM_SETTEXT = 0xC
         WM_GETTEXTLENGTH = 0xE
         WM_CLOSE = 0x10
+        
+        WM_COMMAND = 273
 
         SW_MAXIMIZE = 3
         SW_MINIMIZE = 6
@@ -26,6 +28,11 @@ module RAutomation
         KEYEVENTF_EXTENDEDKEY = 0x1
         KEYEVENTF_KEYUP = 0x2
 
+        # Mouse
+        WM_LBUTTONDOWN = 513
+        WM_LBUTTONUP = 514
+        MK_LBUTTON = 1
+        
         # GetWindow constants
         GW_ENABLEDPOPUP = 6
 
@@ -66,6 +73,23 @@ module RAutomation
         INPUT_MOUSE = 0
         MOUSEEVENTF_LEFTDOWN = 0x2
         MOUSEEVENTF_LEFTUP = 0x4
+        
+        # SetWinEventHook
+        WINEVENT_OUTOFCONTEXT = 0x0
+        WINEVENT_SKIPOWNTHREAD = 0x1
+        WINEVENT_SKIPOWNPROCESS = 0x2
+        WINEVENT_INCONTEXT = 0x4
+        
+        # PeekMessage
+        PM_NOREMOVE = 0x0
+        PM_REMOVE = 0x1
+        PM_NOYIELD = 0x2
+        
+        # menu
+        EVENT_SYSTEM_MENUSTART = 0x4
+        EVENT_SYSTEM_MENUEND = 0x5
+        EVENT_SYSTEM_MENUPOPUPSTART = 0x6
+        EVENT_SYSTEM_MENUPOPUPEND = 0x7
 
       end
     end
