@@ -1,11 +1,17 @@
 require 'windows/process'
+require 'windows/handle'
+require 'win32/process'
+
+include Windows::Process
+include Windows::Handle
 
 module RAutomation
   class Application
 
+    include Adapter::Helper
+    extend ElementCollections
+  
     attr_reader :pid
-    
-    has_many :windows
   
     def initialize(options={})
       path = options[:path]
@@ -19,14 +25,14 @@ module RAutomation
       end
       
       process = Process.create(
-        :command_line => command,
+        :command_line => command_line,
         :close_handles => false,
         :creation_flags => Process::DETACHED_PROCESS
       )
       
-      @pid = process.pid
+      @pid = process.process_id
       
-      WaitForInputIdle(process, 60000)
+      WaitForInputIdle(process.process_handle, 60000)
       
       CloseHandle(process.process_handle)
       CloseHandle(process.thread_handle)
@@ -51,24 +57,12 @@ module RAutomation
       return children
     end
     
-    def focused_ui_element
-      # TODO: Implement this
-    end
-    
     def raise!
       main_window.activate
     end
     
     def frontmost?
       return main_window.active?
-    end
-    
-    def hide
-      # TODO: Can't hide apps on Windows. Throw exception?
-    end
-    
-    def show
-      # TODO: Can't hide apps on Windows. Throw exception?
     end
     
     def hidden?

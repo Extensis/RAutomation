@@ -52,7 +52,7 @@ module RAutomation
         end
         
         def click
-          if @window != nil && @window.exists? && shortcut_char != nil
+          if @window != nil && @window.exists? && @shortcut_char != nil
             if !is_submenu?
               @window.send_key(Keys.alt)
             end
@@ -62,7 +62,7 @@ module RAutomation
         end
         
         def is_submenu?
-          return @window != nil && @window.exists? && @window.class == "#32768"
+          return @window != nil && @window.exists? && @window.window_class == "#32768"
         end
         
         def submenu_hmenu

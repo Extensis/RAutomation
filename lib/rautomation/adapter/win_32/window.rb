@@ -57,6 +57,10 @@ module RAutomation
         def title
           Functions.window_title(hwnd)
         end
+        
+        def window_class
+          Functions.window_class(hwnd)
+        end
 
         # @see RAutomation::Window#class_names
         def class_names
