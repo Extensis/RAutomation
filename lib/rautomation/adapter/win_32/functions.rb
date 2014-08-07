@@ -59,6 +59,8 @@ module RAutomation
                         [:long], :int
         attach_function :_set_control_focus, :SetFocus,
                         [:long], :long
+        attach_function :get_focus, :GetFocus,
+                        [], :long
         attach_function :get_window, :GetWindow,
                         [:long, :uint], :long
         attach_function :get_last_error, :GetLastError,
@@ -75,10 +77,24 @@ module RAutomation
                         [:long, :int], :long
         attach_function :get_menu_item_count, :GetMenuItemCount,
                         [:long], :int
-        attach_function :_get_menu_string, :GetMenuString,
+        attach_function :get_menu_item_id, :GetMenuItemID,
+                        [:long, :int], :int
+        attach_function :_get_menu_string, :GetMenuStringA,
                         [:long, :int, :pointer, :int, :int], :int
         attach_function :_get_menu_item_rect, :GetMenuItemRect,
                         [:long, :long, :int, :pointer], :bool
+        attach_function :_set_win_event_hook, :SetWinEventHook,
+                        [:int, :int, :long, :pointer, :long, :long, :int], :long
+        attach_function :unhook_win_event, :UnhookWinEvent,
+                        [:long], :bool
+        attach_function :_get_message, :GetMessageA,
+                        [:pointer, :long, :int, :int], :bool
+        attach_function :_translate_message, :TranslateMessage,
+                        [:pointer], :bool
+        attach_function :_dispatch_message, :DispatchMessageA,
+                        [:pointer], :long
+        attach_function :_peek_message, :PeekMessageA,
+                        [:pointer, :long, :int, :int, :int], :bool
 
         # kernel32
         attach_function :current_thread_id, :GetCurrentThreadId,
@@ -106,8 +122,22 @@ module RAutomation
         attach_function :get_table_row_state, :get_table_row_state,
                         [:long, :long, :long], :long
 
+        class MessageStruct < FFI::Struct
+          layout :hwnd, :long,
+                 :message, :int,
+                 :wparam, :long,
+                 :lparam, :long,
+                 :time, :long,
+                 :x, :long,
+                 :y, :long
+        end
+                        
         class << self
 
+          def make_lparam(l, h)
+            l | (h << 16)
+          end
+        
           def window_title(hwnd)
             title_length = window_title_length(hwnd) + 1
             title = FFI::MemoryPointer.new :char, title_length
@@ -202,11 +232,11 @@ module RAutomation
               bring_window_to_top(hwnd)
             end
           end
-
+          
           def get_menu_string(hmenu, item)
             string_length = _get_menu_string(hmenu, item, nil, 0, 0x400)
-            string = FFI::MemoryPointer.new :char, string_length
-            _get_menu_string(hmenu, item, string, string_length, 0x400)
+            string = FFI::MemoryPointer.new :char, string_length + 1
+            _get_menu_string(hmenu, item, string, string_length + 1, 0x400)
             string.read_string
           end
           
@@ -214,6 +244,10 @@ module RAutomation
             x = FFI::MemoryPointer.new(:long, 4)
             _get_menu_item_rect(hwnd, hmenu, index, x)
             x.read_array_of_long(4)
+          end
+          
+          def set_win_event_hook(eventMin, eventMax, callback, pid)
+            _set_win_event_hook(eventMin, eventMax, 0, callback, pid, 0, Constants::WINEVENT_OUTOFCONTEXT)
           end
           
           alias_method :activate_control, :activate_window
@@ -262,6 +296,19 @@ module RAutomation
             string_buffer = FFI::MemoryPointer.new :char, text_len
             send_message(control_hwnd, Constants::CB_GETLBTEXT, item_no, string_buffer)
             string_buffer.read_string
+          end
+          
+          def process_messages(hwnd, minEvent, maxEvent)
+            pointer = FFI::MemoryPointer.new(:char, MessageStruct.size, false)
+            while(_peek_message(pointer, hwnd, minEvent, maxEvent, Constants::PM_REMOVE))
+              _translate_message(pointer);
+              _dispatch_message(pointer);
+            end
+          end
+          
+          def get_hmenu(hwnd)
+            hmenu = FFI::MemoryPointer.new :int
+            send_message(hwnd, 0x01E1, 0, hmenu)
           end
 
           private

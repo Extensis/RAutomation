@@ -185,7 +185,16 @@ module RAutomation
         end
 
         def menu_bar
-          Menu.new(self)
+          if @found_menu == false
+            @menu_bar = Menu.new(hwnd, nil)
+          end
+          
+          @found_menu = true
+          @menu_bar
+        end
+        
+        def popup_menu
+          Menu.new(nil, nil)
         end
         
         # @see Button#initialize
@@ -247,6 +256,15 @@ module RAutomation
           Table.new(self, locator)
         end
 
+        def menu(locator={})
+          @container.wait_until_present
+          if menu_bar!= nil && menu_bar.exists?
+            return menu_bar.menu_item(locator)
+          else
+            return popup_menu.menu_item(locator)
+          end
+        end
+        
         # Creates the child window object.
         # @note This is an Win32 adapter specific method, not part of the public API
         # @example
@@ -258,6 +276,37 @@ module RAutomation
           RAutomation::Window.new Functions.child_window_locators(hwnd, locators)
         end
 
+        def hook_events(eventMin, eventMax, c)
+          if @callback != nil
+            unhook_events
+          end
+        
+          @eventMin = eventMin
+          @eventMax = eventMax
+        
+          @callback = FFI::Function.new(:void, [:long, :long, :long, :long, :long, :long, :long], c)
+          
+          Functions.set_win_event_hook(eventMin, eventMax, @callback, pid)
+        end
+        
+        def unhook_events
+          if @callback != nil
+            print "UnhookWinEvent\n"
+            Functions.unhook_win_event(@callback)
+          end
+          
+          @callback = nil
+        end
+        
+        def process_messages
+          Functions.process_messages(hwnd, @eventMin, @eventMax)
+        end
+        
+        def wait_for_submenu
+          while process_messages
+          end
+        end
+        
         private
 
         def press_key key
@@ -275,6 +324,7 @@ module RAutomation
           release_key key
           key
         end
+        
       end
     end
   end
