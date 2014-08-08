@@ -41,6 +41,8 @@ module RAutomation
                         [:long, :uint, :uint, :pointer, :uint, :uint, :pointer], :bool
         attach_function :post_message, :PostMessageA,
                         [:long, :uint, :uint, :pointer], :bool
+        attach_function :get_foreground_window, :GetForegroundWindow,
+                        [], :long
         attach_function :window_thread_process_id, :GetWindowThreadProcessId,
                         [:long, :pointer], :long
         attach_function :attach_thread_input, :AttachThreadInput,
@@ -95,8 +97,8 @@ module RAutomation
                         [:pointer], :long
         attach_function :_peek_message, :PeekMessageA,
                         [:pointer, :long, :int, :int, :int], :bool
-
         # kernel32
+
         attach_function :current_thread_id, :GetCurrentThreadId,
                         [], :long
         attach_function :open_process, :OpenProcess,
