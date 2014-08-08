@@ -30,16 +30,17 @@ module RAutomation
         :creation_flags => Process::DETACHED_PROCESS
       )
       
-      @pid = process.process_id
-      
       WaitForInputIdle(process.process_handle, 60000)
       
       CloseHandle(process.process_handle)
       CloseHandle(process.thread_handle)
+      
+      hwnd = RAutomation::Adapter::Win32::Functions.get_foreground_window
+      @pid = RAutomation::Adapter::Win32::Functions.window_pid(hwnd)
     end
     
     def windows
-      return Windows.new(nil, :pid=> @pid, :adapter => @adapter)
+      return Windows.new(nil, :adapter => @adapter).select { | window | window.pid == @pid }
     end
     
     def main_window
