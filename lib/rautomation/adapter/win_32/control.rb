@@ -71,6 +71,10 @@ module RAutomation
           Functions.has_focus?(hwnd)
         end
 
+        def title
+          Functions.control_title(hwnd)
+        end
+        
         def value
           Functions.control_value(hwnd)
         end
