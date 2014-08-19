@@ -1,3 +1,4 @@
+require 'set'
 require 'windows/process'
 require 'windows/handle'
 require 'win32/process'
@@ -23,7 +24,7 @@ module RAutomation
       if args != nil and args.length > 0
         command_line += " " + args.join(" ")
       end
-      
+	
       process = Process.create(
         :command_line => command_line,
         :close_handles => false,
@@ -35,16 +36,33 @@ module RAutomation
       CloseHandle(process.process_handle)
       CloseHandle(process.thread_handle)
       
-      hwnd = RAutomation::Adapter::Win32::Functions.get_foreground_window
-      @pid = RAutomation::Adapter::Win32::Functions.window_pid(hwnd)
-    end
+	  pids = Set.new([])
+	  RAutomation::Window.windows.each { | window | pids.add(window.pid) }
+	  
+	  sleep(2)
+	  if (pids.include? process.process_id)
+	    # The PID still exists, so it was the PID that launched the process.
+		@pid = process.process_id
+	  else
+	    # The PID no longer exists, meaning the application was already running
+		# when we tried to launch it.
+        hwnd = RAutomation::Adapter::Win32::Functions.get_foreground_window
+        @pid = RAutomation::Adapter::Win32::Functions.window_pid(hwnd)
+	  end
+	end
     
     def windows
       return Windows.new(nil, :adapter => @adapter).select { | window | window.pid == @pid }
     end
     
     def main_window
-      return windows[0]
+	  candidates = windows.select { | window | window.active? }
+	  
+	  if candidates.length > 0
+		return windows[0]
+	  else
+	    return nil
+	  end
     end
     
     def menu_bar

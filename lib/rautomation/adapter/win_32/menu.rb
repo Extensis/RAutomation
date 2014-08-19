@@ -29,8 +29,15 @@ module RAutomation
           if exists?
             @children = []
             numChildren = count
+			keyboard_index = 0
             for childNum in 0...numChildren
-              @children.push(MenuItem.new(@window, @hmenu, childNum))
+              @children.push(MenuItem.new(@window, @hmenu, childNum, keyboard_index))
+			  
+			  title = @children[-1].title
+			  
+			  if title != nil && title != ""
+				keyboard_index += 1
+			  end
             end
           end
           
@@ -49,14 +56,14 @@ module RAutomation
         def menu_item(locator)
           title = locator[:title]
           title.force_encoding("ASCII-8BIT")
-          
+		  
           for child in @children
             if child.title == title
               return child
             end
           end
           
-          MenuItem.new(nil, nil, 0)
+          MenuItem.new(nil, nil, 0, 0)
         end
       
       end

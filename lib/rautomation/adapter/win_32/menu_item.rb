@@ -3,12 +3,13 @@ module RAutomation
     module Win32
       class MenuItem
       
-        attr_accessor :title, :id, :rect
+        attr_accessor :title, :id, :rect, :index, :keyboard_index
       
-        def initialize(window, hmenu, index)
+        def initialize(window, hmenu, index, keyboard_index)
           @window = window
           @hmenu = hmenu
           @index = index
+		  @keyboard_index = keyboard_index
           
           if @hmenu != nil
             parse_title(Functions::get_menu_string(@hmenu, index))
@@ -16,7 +17,7 @@ module RAutomation
         end
         
         def parse_title(title)
-          if title != nil        
+          if title != nil
             components = title.split("\u0008")
             
             if components.length > 0
