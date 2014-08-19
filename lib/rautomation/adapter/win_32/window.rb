@@ -295,7 +295,6 @@ module RAutomation
         
         def unhook_events
           if @callback != nil
-            print "UnhookWinEvent\n"
             Functions.unhook_win_event(@callback)
           end
           
@@ -309,6 +308,8 @@ module RAutomation
         def wait_for_submenu
           while process_messages
           end
+          
+          sleep(1)
         end
         
         private
