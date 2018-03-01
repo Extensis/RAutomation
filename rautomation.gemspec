@@ -22,7 +22,7 @@ RAutomation provides:
     "ext/UiaDll/Release/RAutomation.UIA.dll",
     "ext/WindowsForms/Release/WindowsForms.exe"
   ]
-  s.files         = `git ls-files`.split("\n") + ext_binaries
+  s.files         = `git ls-files lib`.split("\n") + ext_binaries
   s.test_files    = `git ls-files -- spec/*`.split("\n")
   s.require_paths = ["lib"]
 
